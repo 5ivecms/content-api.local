@@ -1,0 +1,36 @@
+Options +FollowSymlinks
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} ^/(api)
+RewriteRule ^api/assets/(.*)$ api/web/assets/$1 [L]
+RewriteRule ^api/css/(.*)$ api/web/css/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/api/web/(assets|css)/
+RewriteCond %{REQUEST_URI} ^/(api)
+RewriteRule ^.*$ api/web/index.php [L]
+
+# deal with admin first
+RewriteCond %{REQUEST_URI} ^/(admin)
+RewriteRule ^admin/assets/(.*)$ backend/web/assets/$1 [L]
+RewriteRule ^admin/css/(.*)$ backend/web/css/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/backend/web/(assets|css)/
+RewriteCond %{REQUEST_URI} ^/(admin)
+RewriteRule ^.*$ backend/web/index.php [L]
+
+RewriteCond %{REQUEST_URI} ^/(assets|css|themes|uploads|storage|plugins)
+RewriteRule ^assets/(.*)$ frontend/web/assets/$1 [L]
+RewriteRule ^storage/(.*)$ storage/$1 [L]
+RewriteRule ^css/(.*)$ frontend/web/css/$1 [L]
+RewriteRule ^themes/(.*)$ frontend/themes/$1 [L]
+RewriteRule ^uploads/(.*)$ frontend/web/uploads/$1 [L]
+RewriteRule ^sitemap/(.*)$ frontend/web/sitemap/$1 [L]
+RewriteRule ^plugins/(.*)$ frontend/web/plugins/$1 [L]
+RewriteRule ^robots.txt$ frontend/web/robots.txt [L]
+RewriteRule ^favicon.ico$ frontend/web/favicon.ico [L]
+
+RewriteCond %{REQUEST_URI} !^/((frontend|backend|api)/(web)/(assets|css|plugins)|frontend/themes)/
+RewriteCond %{REQUEST_URI} !index.php
+RewriteCond %{REQUEST_FILENAME} !-f [OR]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ frontend/web/index.php
