@@ -20,6 +20,14 @@ return [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
           ],
+        'migrate' => [
+            'class' => 'yii\console\controllers\MigrateController',
+            'migrationPath' => [
+                '@app/migrations',
+                '@vendor/pheme/yii2-settings/migrations',
+                '@app/migrations/settings',
+            ],
+        ],
     ],
     'components' => [
         'log' => [

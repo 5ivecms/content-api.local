@@ -7,10 +7,10 @@ use common\models\Proxy;
 use common\models\Useragent;
 use Curl\Curl;
 use Curl\MultiCurl;
+use Yii;
 
 class Parser
 {
-    private $proxySettings = [];
     private $useragentList = [];
     private $multiCurl;
     private $data = null;
@@ -61,8 +61,7 @@ class Parser
     private function loadConfig()
     {
         $proxyManager = new ProxyManager();
-        $this->proxySettings = $proxyManager->getSettings();
-        if ($this->proxySettings['enabled'] && $this->forceUseProxy) {
+        if (Yii::$app->settings->get('proxy', 'enabled') && $this->forceUseProxy) {
             $this->proxies = $proxyManager->getProxy();
             if (!$this->proxies) {
                 die('no proxy');
@@ -83,7 +82,7 @@ class Parser
         $curl->setOpt(CURLOPT_HTTPGET, true);
         $curl->setOpt(CURLOPT_FRESH_CONNECT, 1);
         $curl->setOpt(CURLOPT_FOLLOWLOCATION, 1);
-        $curl->setOpt(CURLOPT_TIMEOUT, $this->proxySettings['timeout']);
+        $curl->setOpt(CURLOPT_TIMEOUT, Yii::$app->settings->get('proxy', 'timeout'));
 
         if (is_array($proxy)) {
             $curl->setProxy($proxy['ip'], $proxy['port'], $proxy['login'], $proxy['password']);
@@ -231,7 +230,7 @@ class Parser
             return true;
         } elseif ($this->onlyJSONResponse && !$this->isJSONResponse($instance->response)) {
             $this->addFailedUrls($instance->url);
-            if ($this->proxySettings['enabled']) {
+            if (Yii::$app->settings->get('proxy', 'enabled')) {
                 Proxy::updateCaptchaCounterByProxy($this->findProxyByUrl($instance->url));
             }
             return true;
@@ -254,7 +253,7 @@ class Parser
             $this->removeFromFailedUrls($instance->url);
             return true;
         } else if ($instance->errorCode != 200) {
-            if ($this->proxySettings['enabled']) {
+            if (Yii::$app->settings->get('proxy', 'enabled')) {
                 Proxy::updateErrorsCounterByProxy($this->findProxyByUrl($instance->url));
             }
             $this->addFailedUrls($instance->url);

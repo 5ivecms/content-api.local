@@ -2,6 +2,7 @@
 
 use kartik\grid\GridView;
 use yii\bootstrap4\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\BlacklistSearch */
@@ -9,18 +10,28 @@ use yii\bootstrap4\Html;
 
 $this->title = 'Черный список';
 $this->params['breadcrumbs'][] = $this->title;
+
+$selectedOptions = [
+    Url::to(['blacklist/delete-selected']) => 'Удалить выбранные',
+];
 ?>
+
 <div class="blacklist-index">
 
     <?= GridView::widget([
+        'id' => 'blacklist-gridview',
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
+            [
+                'class' => '\kartik\grid\CheckboxColumn',
+                'rowSelectedClass' => GridView::BS_TABLE_INFO,
+                'checkboxOptions' => function ($model) {
+                    return ['value' => $model->id];
+                },
+            ],
             ['class' => 'kartik\grid\SerialColumn'],
-
-            'id',
             'domain',
-
             ['class' => 'kartik\grid\ActionColumn'],
         ],
         'toolbar' => [
@@ -47,8 +58,45 @@ $this->params['breadcrumbs'][] = $this->title;
             'heading' => '<h3 class="card-title">Список сайтов</h3>',
             'type' => 'default',
             'after' => false,
+            'before' =>
+                '<div class="form-inline">' .
+                Html::dropDownList('action', null, $selectedOptions, ['id' => 'action', 'class' => 'form-control mr-2']) .
+                '<button id="actionBtn" type="submit" class="btn btn-primary mr-4">Выполнить</button>' .
+                '</div>'
         ],
     ]); ?>
 
-
 </div>
+
+
+<?php
+$js = <<< JS
+$(document).on('click', '#actionBtn', function (event) {
+    event.preventDefault();
+
+    var grid = $(this).data('grid');
+    var Ids = $('#blacklist-gridview').yiiGridView('getSelectedRows');
+    var status = $(this).data('status');
+    var action = $('#action').val();
+    var actionText = $('#action').find('option:selected').text();
+
+    if (confirm('Точно ' + actionText + ' выбранные?')) {
+        $.ajax({
+            type: 'POST',
+            url: action,
+            data: {ids: Ids},
+            dataType: 'JSON',
+            success: function (resp) {
+                if (resp.success) {
+                    alert(resp.msg);
+                }
+                location.reload();
+            }
+        });
+    }
+});
+JS;
+
+$this->registerJs($js, \yii\web\View::POS_READY);
+
+?>

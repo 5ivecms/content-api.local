@@ -6,8 +6,23 @@ use yii\helpers\Url;
 echo DetailView::widget([
     'model' => $model,
     'attributes' => [
-        'id',
-        'useragent:ntext',
+        [
+            'columns' => [
+                [
+                    'attribute' => 'id',
+                    'displayOnly' => true,
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
+        [
+            'columns' => [
+                [
+                    'attribute' => 'useragent',
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
     ],
     'striped' => false,
     'fadeDelay' => 100,

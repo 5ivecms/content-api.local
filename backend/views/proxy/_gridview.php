@@ -248,7 +248,6 @@ echo GridView::widget([
         'after' => false,
         'before' =>
             '<div class="form-inline">' .
-            '<b class="d-inline-block mr-3">Действие: </b>' .
             Html::dropDownList('action', null, $selectedOptions, ['id' => 'action', 'class' => 'form-control mr-2']) .
             '<button id="actionBtn" type="submit" class="btn btn-primary mr-4">Выполнить</button>' .
             '</div>'

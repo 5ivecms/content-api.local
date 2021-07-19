@@ -1,21 +1,22 @@
 <?php
 
-namespace common\components\ContentCreator;
+namespace common\components\ArticleCreator;
 
 use andreskrey\Readability\Configuration;
 use andreskrey\Readability\Readability;
 use common\components\Parser;
 
-class ContentCreator
+class ArticleCreator
 {
     const CHUNK_TAG = 'h2';
 
     private $articleLinks;
     private $articles = [];
-    private $generatedArticle;
     private $mode = 1;
     private $chunksLimit = 5;
     private $articlesLimit = 5;
+    private $generatedArticle;
+    private $chunks = [];
 
     public function create()
     {
@@ -26,6 +27,7 @@ class ContentCreator
         if ($this->getMode() !== 1) {
             $this->articleChunk();
             $this->deleteArticlesWithEmptyChunks();
+            $this->sortArticleByCountChunk();
         }
 
         return true;
@@ -49,6 +51,7 @@ class ContentCreator
     private function createArticles()
     {
         $parser = new Parser(false);
+
         $parser->setJsonDecoder(false);
         $parser->setOnlyJSONResponse(false);
         $parser->addUrls($this->getArticleLinks());
@@ -69,7 +72,7 @@ class ContentCreator
                 unset($result[$k]);
                 continue;
             }
-            if (strlen($item['response']) > 1000000) {
+            if (strlen($item['response']) > 800000) {
                 unset($result[$k]);
                 continue;
             }
@@ -147,7 +150,6 @@ class ContentCreator
                         continue 2;
                     }
                 }
-                //$article->addChunk(implode($chunks[$index], ''));
             }
         }
     }
@@ -160,6 +162,15 @@ class ContentCreator
             }
         }
         $this->articles = array_values($this->articles);
+    }
+
+    private function sortArticleByCountChunk()
+    {
+        $articles = $this->getArticles();
+        usort($articles, function($obj1, $obj2) {
+            return (-1) * ($obj1->getChunksCount() - $obj2->getChunksCount());
+        });
+        $this->articles = array_values($articles);
     }
 
     public function setMode($mode)
@@ -202,6 +213,11 @@ class ContentCreator
         $this->generatedArticle = $article;
     }
 
+    public function addChunk($chunk)
+    {
+        array_push($this->chunks, $chunk);
+    }
+
     public function generateArticle()
     {
         switch ($this->mode) {
@@ -221,6 +237,21 @@ class ContentCreator
                 $this->generateModeFive();
                 break;
         }
+
+        $chunksContent = [];
+        foreach ($this->chunks as $k => $chunk) {
+            $preparedChunk = $this->prepareChunk($chunk);
+            array_push($chunksContent, $preparedChunk['content']);
+        }
+
+        $this->generatedArticle = implode(PHP_EOL, $chunksContent);
+    }
+
+    private function prepareChunk($chunk)
+    {
+        $newChunkContent = ArticleCleaner::deleteExternalLinks($chunk['content']);
+        $newChunkContent = ArticleCleaner::fixLazyImages($newChunkContent, $chunk['url']);
+        return ['url' => $chunk['url'], 'content' => $newChunkContent];
     }
 
     private function randomFirstChunk()
@@ -302,7 +333,6 @@ class ContentCreator
 
     private function generateModeFive()
     {
-        $parts = [];
         if (count($this->getArticles()) === 0) {
             $this->generatedArticle = '';
             return false;
@@ -317,10 +347,9 @@ class ContentCreator
                 continue;
             }
             foreach ($articleChunks as $articleChunk) {
-                array_push($parts, $articleChunk);
+                $this->addChunk(['url' => $article->getUrl(), 'content' => $articleChunk]);
             }
         }
-        $this->generatedArticle = implode(PHP_EOL, $parts);
 
         return true;
     }

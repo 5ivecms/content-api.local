@@ -2,6 +2,7 @@
 
 use kartik\grid\GridView;
 use yii\bootstrap4\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\UserSearch */
@@ -10,6 +11,9 @@ use yii\bootstrap4\Html;
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
 
+$selectedOptions = [
+    Url::to(['blacklist/delete-selected']) => 'Удалить выбранные',
+];
 ?>
 
 <div class="user-index">
@@ -18,8 +22,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-
-            'id',
+            [
+                'class' => '\kartik\grid\CheckboxColumn',
+                'rowSelectedClass' => GridView::BS_TABLE_INFO,
+                'checkboxOptions' => function ($model) {
+                    return ['value' => $model->id];
+                },
+            ],
+            ['class' => 'kartik\grid\SerialColumn'],
             'username',
             'email',
             'access_token',
@@ -50,6 +60,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'heading' => '<h3 class="card-title">Список пользователей</h3>',
             'type' => 'default',
             'after' => false,
+            'before' =>
+                '<div class="form-inline">' .
+                Html::dropDownList('action', null, $selectedOptions, ['id' => 'action', 'class' => 'form-control mr-2']) .
+                '<button id="actionBtn" type="submit" class="btn btn-primary mr-4">Выполнить</button>' .
+                '</div>'
         ],
     ]); ?>
 

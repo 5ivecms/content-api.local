@@ -1,12 +1,13 @@
 <?php
 
-namespace common\components\ContentCreator;
+namespace common\components\ArticleCreator;
 
 class Article
 {
     private $title;
     private $content;
     private $url;
+    private $chunksCount = 0;
     private $chunks = [];
 
     public function __construct($title, $content, $url)
@@ -44,6 +45,7 @@ class Article
     public function addChunk($chunk)
     {
         array_push($this->chunks, $chunk);
+        $this->incrementChunksCount();
     }
 
     public function getChunks()
@@ -54,5 +56,15 @@ class Article
     public function setChunks($chunks)
     {
         $this->chunks = $chunks;
+    }
+
+    public function incrementChunksCount()
+    {
+        $this->chunksCount += 1;
+    }
+
+    public function getChunksCount()
+    {
+        return $this->chunksCount;
     }
 }

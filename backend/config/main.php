@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-backend',
+    'name' => '5ive.ContentAPI',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'homeUrl' => '/admin',
@@ -15,7 +16,12 @@ return [
     'modules' => [
         'gridview' => [
             'class' => '\kartik\grid\Module'
-        ]
+        ],
+        'settings' => [
+            'class' => 'pheme\settings\Module',
+            'sourceLanguage' => 'en',
+            'viewPath' => '@app/views/settings',
+        ],
     ],
     'components' => [
         'request' => [
@@ -51,6 +57,9 @@ return [
             ],
         ],
 
+        'settings' => [
+            'class' => 'pheme\settings\components\Settings'
+        ],
     ],
     'params' => $params,
 ];

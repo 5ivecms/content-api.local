@@ -17,9 +17,9 @@ use yii\widgets\ActiveForm;
                     <h3 class="card-title">Добавить списком</h3>
                 </div>
                 <div class="card-body">
-                    <?php $form = ActiveForm::begin(); ?>
+                    <?php $form = ActiveForm::begin(['action' => ['blacklist/create-list']]); ?>
 
-                    <?= $form->field($model, 'domain')->textarea(['rows' => 10, 'placeholder' => 'Список доменов. Каждый с новой строки'])->label(false) ?>
+                    <?= $form->field($model, 'list')->textarea(['rows' => 10, 'placeholder' => 'Список доменов. Каждый с новой строки'])->label(false) ?>
 
                     <div class="form-group">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>

@@ -2,54 +2,70 @@
 
 namespace api\modules\v1\controllers;
 
-use common\components\ContentCreator\BrokenLinksCleaner;
-use common\components\ContentCreator\ContentCleaner;
-use common\components\ContentCreator\ContentCreator;
-use common\components\LinksFilter;
-use common\components\SearxParser;
-use common\models\Blacklist;
+use common\components\ArticleCreator\{BrokenLinksCleaner, ArticleCreator};
+use common\components\Parser\Parsers\{AskParser,
+    LycosParser,
+    MyWebSearchParser,
+    SearxParser,
+    EcosiaParser,
+    WhoogleParser,
+    CSMajentoParser};
+use common\components\Parser\{Configuration};
 
 class GenerateArticleController extends BaseController
 {
-    // http://content-api.local:81/api/v1/generate-articles?keyword=1%D1%85%D0%B1%D0%B5%D1%82%20%D1%81%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%BD%D0%B0%20%D0%B0%D0%BD%D0%B4%D1%80%D0%BE%D0%B8%D0%B4%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%202020&mode=1&pagesLimit=1&articlesLimit=10&chunkLimit=10&startPage=1
     public function actionIndex($keyword, $mode = 5, $pagesLimit = 2, $articlesLimit = 10, $chunkLimit = 10, $startPage = 1)
     {
-        $parser = new SearxParser();
-        $parser->parse($keyword, $pagesLimit, $startPage);
-        $links = $parser->getLinks();
-        if (!is_array($links)) {
+        $links = [];
+        $parserConfig = new Configuration($keyword, $pagesLimit, $startPage);
+        $parsers = [
+            new LycosParser($parserConfig),
+            new EcosiaParser($parserConfig),
+            new MyWebSearchParser($parserConfig),
+            new AskParser($parserConfig),
+            new WhoogleParser($parserConfig),
+            new SearxParser($parserConfig),
+            new CSMajentoParser($parserConfig),
+        ];
+        shuffle($parsers);
+        foreach ($parsers as $parser) {
+            if (count($links) > $articlesLimit * 1.5) {
+                break;
+            }
+            $parser->parse();
+            $links = array_unique(array_merge($links, $parser->getLinks()));
+        }
+
+        if (!count($links)) {
             $result['error'] = 'no links';
             $result['keyword'] = $keyword;
 
             return $result;
         }
 
-        $links = array_chunk($links, $articlesLimit);
+        $links = array_chunk($links, $articlesLimit * 2);
         $links = array_shift($links);
 
-        $contentCreator = new ContentCreator();
-        $contentCreator->setMode($mode);
-        $contentCreator->setChunksLimit($chunkLimit);
-        $contentCreator->setArticlesLimit($articlesLimit);
-        $contentCreator->setArticleLinks($links);
-        if (!$contentCreator->create()) {
+        $articleCreator = new ArticleCreator();
+        $articleCreator->setMode($mode);
+        $articleCreator->setChunksLimit($chunkLimit);
+        $articleCreator->setArticlesLimit($articlesLimit);
+        $articleCreator->setArticleLinks($links);
+        if (!$articleCreator->create()) {
             $result['error'] = 'no create';
             $result['keyword'] = $keyword;
 
             return $result;
         }
 
-        $contentCreator->generateArticle();
-        $articleContent = $contentCreator->getGeneratedArticle();
+        $articleCreator->generateArticle();
+        $articleContent = $articleCreator->getGeneratedArticle();
         if (empty($articleContent)) {
             $result['error'] = 'empty content';
             $result['keyword'] = $keyword;
 
             return $result;
         }
-
-        $articleContent = ContentCleaner::deleteExternalLinks($articleContent);
-        $articleContent = ContentCleaner::fixLazyImages($articleContent);
 
         $bls = new BrokenLinksCleaner();
         $articleContent = $bls->clean($articleContent);

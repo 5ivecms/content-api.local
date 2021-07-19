@@ -1,21 +1,16 @@
 <?php
 
-use yii\helpers\Html;
+use kartik\detail\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Blacklist */
 
-$this->title = 'Update Blacklist: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Blacklists', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
-?>
-<div class="blacklist-update">
+$this->title = 'Редактировать: ' . $model->domain;
+$this->params['breadcrumbs'][] = ['label' => 'Черный список', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->domain, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Редактировать';
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
-</div>
+echo $this->render('_detailview', [
+    'model' => $model,
+    'mode' => DetailView::MODE_EDIT
+]);

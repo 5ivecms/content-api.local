@@ -9,10 +9,39 @@ use yii\helpers\Url;
 echo DetailView::widget([
     'model' => $model,
     'attributes' => [
-        'id',
-        'username',
-        'email',
-        'access_token',
+        [
+            'columns' => [
+                [
+                    'attribute' => 'id',
+                    'displayOnly' => true,
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
+        [
+            'columns' => [
+                [
+                    'attribute' => 'username',
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
+        [
+            'columns' => [
+                [
+                    'attribute' => 'email',
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
+        [
+            'columns' => [
+                [
+                    'attribute' => 'access_token',
+                    'valueColOptions' => ['style' => 'width:100%']
+                ],
+            ],
+        ],
     ],
     'striped' => false,
     'fadeDelay' => 100,

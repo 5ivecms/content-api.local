@@ -23,16 +23,9 @@ echo GridView::widget([
                 return ['value' => $model->id];
             },
         ],
-
-        'id',
+        ['class' => 'kartik\grid\SerialColumn'],
         'useragent:ntext',
-
-        [
-            'width' => '90px',
-            'header' => '',
-            'headerOptions' => ['style' => 'width:90px'],
-            'class' => 'kartik\grid\ActionColumn'
-        ],
+        ['class' => 'kartik\grid\ActionColumn'],
     ],
     'toolbar' => [
         [
@@ -60,7 +53,6 @@ echo GridView::widget([
         'after' => false,
         'before' =>
             '<div class="form-inline">' .
-            '<b class="d-inline-block mr-3">С выбранными: </b>' .
             Html::dropDownList('action', null, $selectedOptions, ['id' => 'action', 'class' => 'form-control mr-2']) .
             '<button id="actionBtn" type="submit" class="btn btn-primary mr-4">Выполнить</button>' .
             '</div>'

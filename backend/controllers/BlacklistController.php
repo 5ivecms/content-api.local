@@ -5,6 +5,7 @@ namespace backend\controllers;
 use Yii;
 use common\models\Blacklist;
 use common\models\BlacklistSearch;
+use yii\helpers\StringHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -75,6 +76,34 @@ class BlacklistController extends Controller
         ]);
     }
 
+    public function actionCreateList()
+    {
+        $model = new Blacklist();
+
+        $post = Yii::$app->request->post();
+        if ($post) {
+            $modelName = StringHelper::basename(get_class($model));
+            $list = $post[$modelName]['list'];
+            $list = explode("\r\n", $list);
+            $list = array_unique($list);
+
+            foreach ($list as $item) {
+                if (!empty($item)) {
+                    $currentModel = new Blacklist();
+                    $currentModel->domain = trim($item);
+                    if (!$currentModel->validate()) {
+                        continue;
+                    }
+                    $currentModel->save();
+                }
+            }
+
+            Yii::$app->session->setFlash('success', 'Черный список обновлен');
+        }
+
+        return $this->redirect(['index']);
+    }
+
     /**
      * Updates an existing Blacklist model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -107,6 +136,21 @@ class BlacklistController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionDeleteSelected()
+    {
+        if (!isset($_POST['ids'])) {
+            return $this->redirect(['proxy/index']);
+        }
+
+        foreach (Blacklist::find()->where(['id' => $_POST['ids']])->all() as $item) {
+            $item->delete();
+        }
+
+        Yii::$app->session->setFlash('success', 'Сайты удалены');
+
+        return $this->redirect(['blacklist/index']);
     }
 
     /**

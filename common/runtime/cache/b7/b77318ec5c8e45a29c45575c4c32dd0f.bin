@@ -1,1 +1,1 @@
-a:2:{i:0;a:3:{s:7:"enabled";i:0;s:7:"timeout";i:5;s:4:"ping";i:500;}i:1;O:25:"yii\caching\TagDependency":3:{s:4:"tags";a:1:{i:0;s:14:"settings.proxy";}s:4:"data";a:1:{s:32:"7678157bf5136203382564d37bca46e9";s:21:"0.87468800 1625700182";}s:8:"reusable";b:0;}}
+a:2:{i:0;a:3:{s:7:"enabled";i:1;s:7:"timeout";i:10;s:4:"ping";i:500;}i:1;O:25:"yii\caching\TagDependency":3:{s:4:"tags";a:1:{i:0;s:14:"settings.proxy";}s:4:"data";a:1:{s:32:"7678157bf5136203382564d37bca46e9";s:21:"0.22334800 1626279185";}s:8:"reusable";b:0;}}

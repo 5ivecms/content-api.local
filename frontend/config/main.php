@@ -12,6 +12,8 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'homeUrl' => '/',
+    'modules' => [
+    ],
     'components' => [
         'request' => [
             'baseUrl' => '',
@@ -46,6 +48,9 @@ return [
             ],
         ],
 
+        'settings' => [
+            'class' => 'pheme\settings\components\Settings'
+        ],
     ],
     'params' => $params,
 ];

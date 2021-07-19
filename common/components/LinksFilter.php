@@ -31,7 +31,7 @@ class LinksFilter
     {
         return array_filter($links, function ($link) {
             $urlParts = parse_url($link);
-            return !$urlParts['path'] !== '' && $urlParts['path'] !== '/';
+            return isset($urlParts['path']) && $urlParts['path'] !== '' && $urlParts['path'] !== '/';
         });
     }
 }

@@ -15,7 +15,12 @@ return [
         'v1' => [
             'basePath' => '@app/modules/v1',
             'class' => 'api\modules\v1\Module'
-        ]
+        ],
+        'settings' => [
+            'class' => 'pheme\settings\Module',
+            'sourceLanguage' => 'en',
+            'viewPath' => '@app/views/settings',
+        ],
     ],
     'components' => [
         'request' => [
@@ -48,14 +53,16 @@ return [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
-            //http://yii-api.loc/api/v1/countries
             'rules' => [
                 [
                     'class' => \yii\rest\UrlRule::class,
                     'controller' => ['v1/generate-article'],
                 ]
             ],        
-        ]
+        ],
+        'settings' => [
+            'class' => 'pheme\settings\components\Settings'
+        ],
     ],
     'params' => $params,
 ];

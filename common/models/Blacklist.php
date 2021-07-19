@@ -10,11 +10,13 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property string|null $domain
- * @property string|null $domainList
+ *
+ * @property string|null $list
  */
+
 class Blacklist extends \yii\db\ActiveRecord
 {
-    public $domainList;
+    public $list;
 
     /**
      * {@inheritdoc}
@@ -32,7 +34,7 @@ class Blacklist extends \yii\db\ActiveRecord
         return [
             [['domain'], 'string', 'max' => 255],
             [['domain'], 'unique'],
-            [['domainList'], 'safe'],
+            [['list'], 'safe'],
         ];
     }
 

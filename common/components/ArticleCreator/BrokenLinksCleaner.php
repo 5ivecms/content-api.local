@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components\ContentCreator;
+namespace common\components\ArticleCreator;
 
 use Curl\MultiCurl;
 use phpQuery;
